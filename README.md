@@ -207,7 +207,7 @@ aws dynamodb delete-table --table-name ContactosCampiclouders
 | Integrante               | Rol |
 |--------------------------|-----|
 | José David Escalante     | Arquitecto / Desarrollador |
-| Integrante 2             | Backend |
+| Maria Alejandra Caicedo  | Backend |
 | Daniela Torres           | Frontend |
 | David Quiceno            | DevOps |
 | Alejandro Franco Cedeño  | QA / Documentación |
