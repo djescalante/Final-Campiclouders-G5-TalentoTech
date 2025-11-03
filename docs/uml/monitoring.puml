@@ -1,0 +1,106 @@
+@startuml monitoring_architecture
+!define AWSPuml https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v18.0/dist
+!include AWSPuml/AWSCommon.puml
+!include AWSPuml/ManagementGovernance/CloudWatch.puml
+!include AWSPuml/ApplicationIntegration/SimpleNotificationService.puml
+!include AWSPuml/Compute/ElasticBeanstalk.puml
+!include AWSPuml/Database/DynamoDB.puml
+!include AWSPuml/Compute/EC2.puml
+
+title Arquitectura de Monitoreo y Observabilidad - CloudWatch
+
+' Definir grupos
+package "Aplicación" {
+    ElasticBeanstalk(eb, "Elastic Beanstalk", "eb-dynamo-env")
+    EC2(ec2, "EC2 Instances", "t3.micro")
+    DynamoDB(dynamo, "DynamoDB", "ContactosCampiclouders")
+}
+
+package "CloudWatch Monitoring" {
+    CloudWatch(dashboard, "Dashboard", "Visualización en Tiempo Real")
+    CloudWatch(logs, "CloudWatch Logs", "Logs Centralizados")
+    CloudWatch(metrics, "Métricas", "Custom & AWS Metrics")
+}
+
+package "Alarmas" {
+    CloudWatch(alarm1, "Alarma 5xx", "Threshold: 10 errores")
+    CloudWatch(alarm2, "Alarma Latencia", "Threshold: 3s")
+    CloudWatch(alarm3, "Alarma CPU", "Threshold: 80%")
+    CloudWatch(alarm4, "Alarma Salud", "Threshold: 15")
+    CloudWatch(alarm5, "Alarma DynamoDB", "Threshold: 5 errores")
+    CloudWatch(alarm6, "Alarma Instancias", "Threshold: < 1")
+    CloudWatch(alarm7, "Alarma Logs", "Threshold: 20 errores")
+}
+
+package "Notificaciones" {
+    SimpleNotificationService(sns, "SNS Topic", "Alertas")
+    actor(email, "Email", "tu-email@ejemplo.com")
+    actor(slack, "Slack", "Opcional")
+    actor(pagerduty, "PagerDuty", "Opcional")
+}
+
+' Flujo de métricas
+eb -down-> metrics : "Envía métricas"
+ec2 -down-> metrics : "Envía métricas"
+dynamo -down-> metrics : "Envía métricas"
+
+' Flujo de logs
+eb -down-> logs : "Envía logs"
+logs -right-> alarm7 : "Metric Filter"
+
+' Dashboard consume métricas
+metrics -up-> dashboard : "Visualiza"
+
+' Alarmas monitorean métricas
+metrics -down-> alarm1
+metrics -down-> alarm2
+metrics -down-> alarm3
+metrics -down-> alarm4
+metrics -down-> alarm5
+metrics -down-> alarm6
+
+' Alarmas notifican a SNS
+alarm1 -right-> sns : "Activa"
+alarm2 -right-> sns : "Activa"
+alarm3 -right-> sns : "Activa"
+alarm4 -right-> sns : "Activa"
+alarm5 -right-> sns : "Activa"
+alarm6 -right-> sns : "Activa"
+alarm7 -right-> sns : "Activa"
+
+' SNS notifica a destinatarios
+sns -down-> email : "Notifica"
+sns -down-> slack : "Notifica"
+sns -down-> pagerduty : "Notifica"
+
+' Notas explicativas
+note right of dashboard
+  **Dashboard incluye:**
+  • Salud del Ambiente
+  • Estado de Instancias
+  • Respuestas HTTP (2xx, 4xx, 5xx)
+  • Latencia (P50, P90, P99)
+  • Uso de CPU y Red
+  • Métricas de DynamoDB
+end note
+
+note right of sns
+  **Múltiples canales:**
+  • Email (confirmación requerida)
+  • Slack (webhook)
+  • PagerDuty (integración)
+  • SMS (opcional)
+end note
+
+note bottom of alarm1
+  **7 Alarmas configuradas:**
+  1. Errores 5xx > 10
+  2. Latencia P99 > 3s
+  3. CPU > 80%
+  4. Salud > 15 (degraded)
+  5. DynamoDB errores > 5
+  6. Instancias OK < 1
+  7. Errores en logs > 20
+end note
+
+@enduml

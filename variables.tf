@@ -51,3 +51,49 @@ variable "solution_stack_name" {
   type        = string
   default     = ""
 }
+
+# ============================================================================
+# VARIABLES DE MONITOREO Y OBSERVABILIDAD
+# ============================================================================
+
+variable "alert_email" {
+  description = "jde.sistemas@gmail.com" # Email para notificaciones de alarmas
+  type        = string
+  default     = "jde.sistemas@gmail.com" # Email para notificaciones de alarmas
+}
+
+variable "alarm_5xx_threshold" {
+  description = "Umbral de errores 5xx para activar alarma"
+  type        = number
+  default     = 10
+}
+
+variable "alarm_latency_threshold" {
+  description = "Umbral de latencia P99 en segundos para activar alarma"
+  type        = number
+  default     = 3.0
+}
+
+variable "alarm_cpu_threshold" {
+  description = "Umbral de uso de CPU (%) para activar alarma"
+  type        = number
+  default     = 80
+}
+
+variable "alarm_dynamodb_errors_threshold" {
+  description = "Umbral de errores de DynamoDB para activar alarma"
+  type        = number
+  default     = 5
+}
+
+variable "alarm_app_error_threshold" {
+  description = "Umbral de errores en logs de aplicación para activar alarma"
+  type        = number
+  default     = 20
+}
+
+variable "log_retention_days" {
+  description = "Días de retención de logs en CloudWatch"
+  type        = number
+  default     = 7
+}
