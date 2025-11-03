@@ -1,0 +1,13 @@
+# Valores de ejemplo para despliegue en AWS.
+# Copia este archivo a "terraform.tfvars" y rellena los valores.
+# NO subas el archivo terraform.tfvars a un repositorio público.
+
+region        = "us-east-1"
+app_name      = "EB-Dynamo"
+env_name      = "eb-dynamo-env"
+table_name    = "ContactosCampiclouders"
+cors_origin   = "*" # Cambia esto por tu dominio de frontend en producción
+instance_type = "t3.micro"
+
+# La variable `platform_arn` ya no es necesaria, Terraform la detecta automáticamente
+# con el data source "aws_elastic_beanstalk_solution_stack".

@@ -1,0 +1,30 @@
+# Archivos de dependencias de Node.js
+/node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Artefactos de despliegue
+/app-deploy.zip
+/app.zip
+
+# Archivos de estado y configuración de Terraform
+# El estado puede contener secretos y no debe ser versionado.
+# Usa un backend remoto (como S3) para trabajo en equipo.
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+.terraform.lock.hcl
+tfplan
+crash.log
+
+# Archivos de configuración local y secretos
+.env
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de log
+*.log

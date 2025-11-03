@@ -1,0 +1,12 @@
+@startuml 
+title Componentes principales
+package "Elastic Beanstalk Environment" {
+  [Static Frontend\n(public)] -down-> [Express API]
+}
+[Express API] ..> (Env Vars: TABLE_NAME, CORS_ORIGIN)
+[Express API] ..> [AWS SDK v3]
+[Express API] --> [IAM Role: aws-elasticbeanstalk-ec2-role]
+[IAM Role: aws-elasticbeanstalk-ec2-role] ..> [Policy ddbBasicAccess]
+[Express API] --> [DynamoDB Table\nContactosCampiclouders]
+@enduml
+

@@ -1,0 +1,10 @@
+@startuml
+title Registro de contacto
+actor Visitante as User
+rectangle "EB App (Node.js)" as App {
+  usecase "Enviar formulario\n/registro (POST)" as UC1
+}
+User --> UC1
+UC1 --> (Guardar en DynamoDB)
+@enduml
+

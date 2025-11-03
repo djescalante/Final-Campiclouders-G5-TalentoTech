@@ -1,0 +1,15 @@
+@startuml
+class Contacto {
+  +id: string
+  +nombres: string
+  +apellido: string
+  +email: string
+  +celular: string
+  +interes: string
+  +createdAt: string
+}
+note right of Contacto::id
+  Partition key (HASH)
+end note
+@enduml
+

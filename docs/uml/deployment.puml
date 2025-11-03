@@ -1,0 +1,15 @@
+@startuml
+node "EB Environment\n(EC2 Instance)" as EC2 {
+  component "Node.js App\nserver.js" as App
+}
+cloud "AWS" {
+  database "DynamoDB Table\nContactosCampiclouders" as DDB
+}
+EC2 -down-> DDB : AWS SDK over HTTPS\nIAM Role auth
+note right of EC2
+  Env: TABLE_NAME, CORS_ORIGIN
+  InstanceType: t3.micro
+  Platform: Node.js 20 AL2023
+end note
+@enduml
+

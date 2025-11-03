@@ -1,0 +1,15 @@
+@startuml
+actor User
+participant "Browser" as B
+participant "Express API\n/registro" as API
+database "DynamoDB\nContactosCampiclouders" as DDB
+
+User -> B: Completa formulario
+B -> API: POST /registro (JSON)
+API -> API: Validar campos
+API -> DDB: PutItem(Item)
+DDB --> API: OK / Error
+API --> B: 200 {ok,id} / 4xx/5xx
+B --> User: Mensaje de éxito/error
+@enduml
+

@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CampiClouders — Registro Grupo de Estudio</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="container">
+      <!-- Nubes decorativas -->
+      <div class="cloud cloud-left"></div>
+      <div class="cloud cloud-right"></div>
+
+      <!-- Header -->
+      <header class="header">
+        <div class="logo">
+          <div class="cloud-icon">☁️</div>
+          <h1>Registro CampiClouders</h1>
+          <div class="cloud-icon">⚡</div>
+        </div>
+        <div class="subtitle">Únete a nuestra base de datos de estudio para aprender mas sobre servicios cloud como:</div>
+        <div class="bootcamp-badge">AWS, AZURE y GCP</div>
+        <div class="bootcamp-badge">DynamoDB + API Gateway/EB</div>
+        <div class="bootcamp-badge">Docker</div>
+        <div class="bootcamp-badge">IAC con Terraform</div> 
+      </header>
+          <div class="section">
+      <h2>👥 Nuestro Equipo</h2>
+      <div class="image-container">
+        <!-- Asegúrate de subir la imagen a S3 en 'images/team-photo.png' -->
+        <img src="images/team-photo.png" alt="Campiclouders G5 Equipo en la Nube" style="width: 100%; max-width: 780px; height: auto; border-radius: 12px;">
+      </div>
+      <div class="team-grid">
+        <div class="team-member"><p class="member-name">Jose David Escalante</p></div>
+        <div class="team-member"><p class="member-name">Daniela Torres</p></div>
+        <div class="team-member"><p class="member-name">David Quiceno</p></div>
+        <div class="team-member"><p class="member-name">Maria Alejandra Caicedo</p></div>
+        <div class="team-member"><p class="member-name">Alejandro Franco Cedeño</p></div>
+      </div>
+    </div>
+
+      <!-- Sección AWS (opcional/ejemplo) -->
+
+    <div class="section">
+      <div class="aws-section">
+        <div class="aws-logo">☁️ AWS</div>
+        <h2>Lo que estamos aprendiendo</h2>
+        <p style="margin: 20px 0;">Explorando los servicios básicos de Amazon Web Services</p>
+        <div class="aws-services">
+          <span class="service-tag">🪣 S3</span>
+          <span class="service-tag">💻 EC2</span>
+          <span class="service-tag">🗄️ RDS</span>
+          <span class="service-tag">🌐 CloudFront</span>
+          <span class="service-tag">🔒 IAM</span>
+          <span class="service-tag">⚡ Lambda</span>
+        </div>
+      </div>
+    </div>
+      <!-- Sección Registro -->
+      <section class="section">
+        <h2>Formulario de Registro de Interés</h2>
+        <p class="section-help">
+          Ingresa tus datos para ser contactado según tu interés de estudio. Estos datos se guardan en DynamoDB.
+        </p>
+        <div class="contact-form">
+
+          <!-- Formulario con las modificaciones de la lista desplegable -->
+          <form id="contact-form" class="formulario">
+            <div class="form-row-registro">
+              <div class="form-field-registro">
+                <label for="nombres">Nombres</label>
+                <input id="nombres" name="nombres" placeholder="Tu nombre" required>
+              </div>
+              <div class="form-field-registro">
+                <label for="apellido">Apellido</label>
+                <input id="apellido" name="apellido" placeholder="Tu apellido" required>
+              </div>
+            </div>
+            <div class="form-row-registro">
+              <div class="form-field-registro">
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" placeholder="tucorreo@ejemplo.com" required>
+              </div>
+              <div class="form-field-registro">
+                <label for="celular">Celular</label>
+                <input id="celular" name="celular" placeholder="300 000 0000" required>
+              </div>
+            </div>
+            <div class="form-row-registro">
+              <div class="form-field-registro">
+                <label for="interes">Área de Mayor Interés</label>
+                <select id="interes" name="interes" required>
+                  <option value="">Selecciona…</option>
+                  <option value="aws">AWS</option>
+                  <option value="kubernetes">Kubernetes</option>
+                  <option value="docker">Docker</option>
+                  <option value="iac">Infraestructura como Código (IaC)</option>
+                  <option value="todo">De todo un poco</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="btn-registro btn-primary-registro">Enviar Registro</button>
+          </form>
+        </div>
+        <div class="status-msg" id="result" aria-live="polite"></div>
+      </section>
+
+      <footer>
+        <p>© 2025 CampiClouders — Registro DynamoDB</p>
+        <div class="aws-logo">☁️</div>
+      </footer>
+    </main>
+
+    <script>
+      (function () {
+        const form = document.getElementById('contact-form');
+        const apiInput = document.getElementById('api-url');
+        const result = document.getElementById('result');
+
+        if (!form) return;
+        form.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          result.textContent = 'Enviando…';
+          const data = {
+            nombres: document.getElementById('nombres').value.trim(),
+            apellido: document.getElementById('apellido').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            celular: document.getElementById('celular').value.trim(),
+            interes: document.getElementById('interes').value
+          };
+          const url = (apiInput?.value && apiInput.value.trim()) || '/registro';
+          try {
+            const resp = await fetch(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data)
+            });
+            const json = await resp.json().catch(() => ({}));
+            if (!resp.ok) throw new Error(json?.error || 'Error en la solicitud');
+            result.textContent = '✅ ¡Registro exitoso! ID: ' + (json.id || 'N/A');
+            form.reset();
+          } catch (err) {
+            result.textContent = '❌ Error al registrar: ' + err.message;
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

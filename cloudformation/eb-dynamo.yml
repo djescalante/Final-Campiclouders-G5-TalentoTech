@@ -1,0 +1,148 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: EB + DynamoDB (Node.js 20 AL2023) with IAM, ApplicationVersion, and Environment
+
+Parameters:
+  AppName:
+    Type: String
+    Default: EB-Dynamo
+  EnvName:
+    Type: String
+    Default: eb-dynamo-env
+  TableName:
+    Type: String
+    Default: ContactosCampiclouders
+  CorsOrigin:
+    Type: String
+    Default: "*"
+  InstanceType:
+    Type: String
+    Default: t3.micro
+  PlatformArn:
+    Type: String
+    Description: Elastic Beanstalk Platform ARN (Node.js 20 on AL2023)
+  SourceS3Bucket:
+    Type: String
+    Description: S3 bucket containing the application bundle (zip)
+  SourceS3Key:
+    Type: String
+    Description: S3 key (path) of the application bundle (zip)
+
+Resources:
+  DynamoTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref TableName
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+
+  EBApplication:
+    Type: AWS::ElasticBeanstalk::Application
+    Properties:
+      ApplicationName: !Ref AppName
+      Description: EB app for Node.js + DynamoDB
+
+  EBAppVersion:
+    Type: AWS::ElasticBeanstalk::ApplicationVersion
+    Properties:
+      ApplicationName: !Ref EBApplication
+      Description: Initial version
+      SourceBundle:
+        S3Bucket: !Ref SourceS3Bucket
+        S3Key: !Ref SourceS3Key
+
+  EBServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AppName}-eb-service-role"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: elasticbeanstalk.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkEnhancedHealth
+        - arn:aws:iam::aws:policy/AWSElasticBeanstalkService
+
+  EBEC2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${AppName}-eb-ec2-role"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: ddbBasicAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:GetItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                  - dynamodb:UpdateItem
+                Resource: !GetAtt DynamoTable.Arn
+              - Effect: Allow
+                Action:
+                  - dynamodb:Query
+                Resource: !Sub "${DynamoTable.Arn}/index/*"
+
+  EBInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub "${AppName}-eb-ec2-role-profile"
+      Roles:
+        - !Ref EBEC2Role
+
+  EBEnvironment:
+    Type: AWS::ElasticBeanstalk::Environment
+    Properties:
+      ApplicationName: !Ref EBApplication
+      EnvironmentName: !Ref EnvName
+      PlatformArn: !Ref PlatformArn
+      VersionLabel: !Ref EBAppVersion
+      OptionSettings:
+        - Namespace: aws:elasticbeanstalk:environment
+          OptionName: EnvironmentType
+          Value: SingleInstance
+        - Namespace: aws:autoscaling:launchconfiguration
+          OptionName: InstanceType
+          Value: !Ref InstanceType
+        - Namespace: aws:autoscaling:launchconfiguration
+          OptionName: IamInstanceProfile
+          Value: !Ref EBInstanceProfile
+        - Namespace: aws:elasticbeanstalk:environment
+          OptionName: ServiceRole
+          Value: !Ref EBServiceRole
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: TABLE_NAME
+          Value: !Ref TableName
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: CORS_ORIGIN
+          Value: !Ref CorsOrigin
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: NODE_ENV
+          Value: production
+        - Namespace: aws:elasticbeanstalk:application:environment
+          OptionName: AWS_REGION
+          Value: !Ref AWS::Region
+
+Outputs:
+  DynamoTableArn:
+    Description: ARN of the DynamoDB table
+    Value: !GetAtt DynamoTable.Arn
+  EBEnvironmentURL:
+    Description: URL of the EB environment
+    Value: !GetAtt EBEnvironment.EndpointURL
