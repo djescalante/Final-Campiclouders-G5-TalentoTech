@@ -52,6 +52,12 @@ variable "solution_stack_name" {
   default     = ""
 }
 
+variable "max_records" {
+  description = "Máximo número de registros permitidos en DynamoDB"
+  type        = number
+  default     = 100
+}
+
 # ============================================================================
 # VARIABLES DE MONITOREO Y OBSERVABILIDAD
 # ============================================================================
