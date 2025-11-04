@@ -122,7 +122,7 @@ El repo incluye archivos Terraform para crear:
 - IAM para acceso mínimo a DynamoDB desde EC2 del EB.
 
 Pasos básicos:
-```
+```bash
 terraform init
 terraform plan -out=tfplan
 terraform apply "tfplan"
@@ -148,8 +148,7 @@ Abre [http://eb-dynamo-env.eba-jq2vhiyi.us-east-1.elasticbeanstalk.com/](http://
 Para eliminar los recursos creados:
 
 ```bash
-eb terminate eb-dynamo-env
-aws dynamodb delete-table --table-name ContactosCampiclouders
+terraform destroy "tfplan" 
 ```
 
 ---
@@ -167,16 +166,16 @@ aws dynamodb delete-table --table-name ContactosCampiclouders
 ---
 
 ## 👥 Equipo CampiClouders
+```bash
+| Integrante                 | Rol                        |
+|----------------------------|----------------------------|
+| 'josé David Escalante'     | Arquitecto / Desarrollador |
+| 'Maria Alejandra Caicedo'  | Backend                    |
+| 'Daniela Torres'           | Frontend                   |
+| 'David Quiceno'            | DevOps                     |
+| 'Alejandro Franco Cedeño'  | QA / Documentación         |
 
-| Integrante               | Rol |
-|--------------------------|-----|
-| José David Escalante     | Arquitecto / Desarrollador |
-| Maria Alejandra Caicedo  | Backend |
-| Daniela Torres           | Frontend |
-| David Quiceno            | DevOps |
-| Alejandro Franco Cedeño  | QA / Documentación |
-
----
+```
 
 ## 💬 Conclusión
 
