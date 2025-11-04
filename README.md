@@ -112,64 +112,28 @@ El proyecto ofrece múltiples guías para que puedas desplegarlo según tu herra
 Para evitar costos, no olvides destruir todos los recursos una vez que hayas terminado tus pruebas. Consulta `guia_limpieza.md` para obtener instrucciones consolidadas y seguras.
 
 
-## 🧰 Instalación Local (modo desarrollo)
 
-1. Clona el repositorio:
-   ```bash
-   git clone https://github.com/djescalante/campiclouders-web-aws-m03.git
-   cd EB-Dynamo
-   ```
 
-2. Instala las dependencias:
-   ```bash
-   npm install
-   ```
+## 🧱 Infraestructura como Código (Terraform)
 
-3. Crea un archivo `.env` (opcional) con:
-   ```bash
-   TABLE_NAME=ContactosCampiclouders
-   CORS_ORIGIN=http://localhost:8080
-   ```
+El repo incluye archivos Terraform para crear:
+- DynamoDB (tabla `ContactosCampiclouders`).
+- Elastic Beanstalk Application + Environment (Node.js 20 / AL2023).
+- IAM para acceso mínimo a DynamoDB desde EC2 del EB.
 
-4. Ejecuta el servidor:
-   ```bash
-   npm start
-   ```
+Pasos básicos:
+```
+terraform init
+terraform plan -out=tfplan
+terraform apply "tfplan"
+```
+Requisitos:
+- Define `platform_arn` en `terraform.tfvars` (ver `guia_terraform.md`).
+- Si `aws-elasticbeanstalk-ec2-role` ya existe, ajusta `eb_ec2_role_name` o importa recursos.
 
-5. Abre [http://localhost:8080](http://localhost:8080) y prueba el formulario.
 
----
+Abre [http://eb-dynamo-env.eba-jq2vhiyi.us-east-1.elasticbeanstalk.com/](http://eb-dynamo-env.eba-jq2vhiyi.us-east-1.elasticbeanstalk.com/) y prueba el formulario.
 
-## 🌩️ Despliegue en AWS Elastic Beanstalk
-
-1. Instala la CLI:
-   ```bash
-   pip install awsebcli --user
-   ```
-
-2. Inicializa el entorno:
-   ```bash
-   eb init -p node.js-20 EB-Dynamo
-   ```
-
-3. Crea o usa el ambiente:
-   ```bash
-   # Si ya existe por Terraform:  eb use eb-dynamo-env
-   # Si no existe aún:            eb create eb-dynamo-env --single --instance_types t3.micro
-   ```
-
-4. Configura variables en el panel de **Configuration → Software**:
-   ```
-   TABLE_NAME=ContactosCampiclouders
-   CORS_ORIGIN=https://TU-ORIGEN
-   ```
-
-5. Abre la aplicación:
-   ```bash
-   eb open
-   ```
-
----
 
 ## 🧾 Ejemplo de Tabla DynamoDB
 
@@ -232,19 +196,3 @@ Para una guía consolidada de desmontaje (Terraform, CLI, CloudFormation, consol
 
 ---
 
-## 🧱 Infraestructura como Código (Terraform)
-
-El repo incluye archivos Terraform para crear:
-- DynamoDB (tabla `ContactosCampiclouders`).
-- Elastic Beanstalk Application + Environment (Node.js 20 / AL2023).
-- IAM para acceso mínimo a DynamoDB desde EC2 del EB.
-
-Pasos básicos:
-```
-terraform init
-terraform plan -out=tfplan
-terraform apply "tfplan"
-```
-Requisitos:
-- Define `platform_arn` en `terraform.tfvars` (ver `guia_terraform.md`).
-- Si `aws-elasticbeanstalk-ec2-role` ya existe, ajusta `eb_ec2_role_name` o importa recursos.
